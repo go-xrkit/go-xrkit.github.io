@@ -1,0 +1,40 @@
+baseURL = 'https://go-xrkit.github.io/'
+locale  = 'en-us'
+title   = 'go-xrkit'
+# No theme — layouts live in ./layouts
+
+disableKinds = ['taxonomy', 'term', 'rss', 'sitemap']
+
+[params]
+  description = "go-xrkit is pure-Go (CGO=0) geometry for immersive video — head orientation, stereo frame packing, and flat/equirectangular/fisheye projection, precomputed into a warp table so reprojecting a frame costs a copy, not a computation. Zero dependencies, 100% coverage, six architectures."
+  brand       = "go-xrkit"
+  github      = "go-xrkit"
+  heroAccent  = "go-xrkit"
+  heroTagline = "The geometry an immersive video player needs. Pure Go, no SDK, no dependencies."
+
+  heroIntro = [
+    "<strong>go-xrkit</strong> is the pure-Go, <strong>cgo-free</strong> geometry an immersive video player needs: orientation (<code>pose</code>), how a frame packs two eyes (<code>stereo</code>), and the projections that turn a flat frame into a world you can look around in (<code>projection</code>). A fourth package, <code>warp</code>, precomputes that projection into a lookup table so reshaping a frame for one eye costs a copy, not a per-pixel computation.",
+    "<strong>go-xrkit/player</strong> (<code>xrplay</code>) puts it to use: hardware decode, per-eye reprojection, full screen on the glasses' own display. There is <strong>no XR SDK in the stereo path</strong> &mdash; the glasses expose their 3D mode as an ordinary display mode, so stereo output is a borderless window with one eye per half."
+  ]
+
+[menu]
+  [[menu.main]]
+    identifier = "why"
+    name       = "Why"
+    url        = "#why"
+    weight     = 10
+  [[menu.main]]
+    identifier = "packages"
+    name       = "Packages"
+    url        = "#packages"
+    weight     = 20
+  [[menu.main]]
+    identifier = "quality"
+    name       = "Quality"
+    url        = "#quality"
+    weight     = 30
+  [[menu.main]]
+    identifier = "docs"
+    name       = "Docs"
+    url        = "https://go-xrkit.github.io/docs/"
+    weight     = 40

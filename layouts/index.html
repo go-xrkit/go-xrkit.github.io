@@ -1,0 +1,95 @@
+{{ define "main" }}
+<section class="hero">
+  <img class="hero-logo" src="{{ "img/logo.svg" | relURL }}" alt="go-xrkit logo" width="96" height="96">
+  <h1>
+    <span class="accent">{{ .Site.Params.heroAccent }}</span>
+  </h1>
+  {{ with .Site.Params.heroTagline }}<p class="tag">{{ . }}</p>{{ end }}
+  <div class="intro">
+    {{ range .Site.Params.heroIntro }}<p>{{ . | safeHTML }}</p>{{ end }}
+  </div>
+  <div class="cta">
+    <a class="btn btn-primary" href="https://go-xrkit.github.io/docs/">Documentation</a>
+    <a class="btn btn-ghost" href="https://github.com/go-xrkit/xrkit">GitHub</a>
+  </div>
+  <p class="pills">
+    <span class="pill">Pure Go</span>
+    <span class="pill">CGO=0</span>
+    <span class="pill">Zero dependencies</span>
+    <span class="pill">6 architectures</span>
+    <span class="pill">BSD-3-Clause</span>
+  </p>
+</section>
+
+<section id="why">
+  <h2>Why go-xrkit</h2>
+  <p>
+    XR glasses expose their 3D mode as an ordinary <strong>display mode</strong> &mdash;
+    a VITURE Beast reports 3840x1080 for side-by-side 3D and 1920x1200 for plain 2D.
+    There is <strong>no XR SDK anywhere in the stereo path</strong>: turning that panel
+    into a believable picture is arithmetic on orientation, eye layout and projection,
+    done exactly and tested against known directions rather than discovered by putting
+    the glasses on. Sign and axis-order mistakes are invisible in a still frame and
+    awful to wear &mdash; <code>pose</code> once shipped with yaw composed before pitch,
+    and every single-axis test passed while it did, because with one non-zero angle the
+    order cannot matter.
+  </p>
+</section>
+
+<section id="packages">
+  <h2>Packages</h2>
+  <p class="section-lead">
+    A single Go module, <code>github.com/go-xrkit/xrkit</code>, split into focused
+    packages &mdash; import only what you need.
+  </p>
+  <div class="grid">
+    <div class="card">
+      <h4><a href="https://github.com/go-xrkit/xrkit/tree/main/pose">pose</a></h4>
+      <p>Quaternions, the Euler convention head trackers actually report, recentring ("this is straight ahead now") and smoothing for a noisy tracker at rest.</p>
+    </div>
+    <div class="card">
+      <h4><a href="https://github.com/go-xrkit/xrkit/tree/main/stereo">stereo</a></h4>
+      <p>How a frame packs two eyes &mdash; mono, side-by-side, top-bottom &mdash; and an explicit <code>Swapped</code> flag, because eye-reversed material is not detectable from the pixels.</p>
+    </div>
+    <div class="card">
+      <h4><a href="https://github.com/go-xrkit/xrkit/tree/main/projection">projection</a></h4>
+      <p>Direction &harr; picture: a flat virtual screen, equirectangular (360&times;180 or VR180's 180&times;180), and equidistant fisheye (180&deg; to 200&deg;).</p>
+    </div>
+    <div class="card">
+      <h4><a href="https://github.com/go-xrkit/xrkit/tree/main/warp">warp</a></h4>
+      <p>The projection precomputed into a lookup table, so reshaping a frame for one eye costs a copy, not a per-pixel computation. Both eyes at 4K: ~3&nbsp;ms; at 8K: ~8&nbsp;ms &mdash; against a 16.6&nbsp;ms budget at 60&nbsp;Hz, with zero allocations per frame.</p>
+    </div>
+  </div>
+</section>
+
+<section id="player">
+  <h2>The player</h2>
+  <p class="section-lead">
+    <a href="https://github.com/go-xrkit/player"><code>go-xrkit/player</code></a> puts the
+    geometry to use: <code>xrplay film.mp4</code> detects the projection and layout from
+    the file, decodes on the GPU, warps each eye, and shows the result full screen on the
+    glasses' own display &mdash; joining
+    <a href="https://github.com/go-macos/avfoundation">go-macos/avfoundation</a> for
+    hardware decode and <a href="https://github.com/go-widgets/window">go-widgets/window</a>
+    for the window, neither of which knows anything about the other.
+  </p>
+  <p class="section-lead">
+    There is no head tracking yet: the VITURE Beast's IMU is not reachable over HID
+    &mdash; its interfaces open and accept commands but emit nothing, proven against a
+    control run that captured 481 reports from the same reader on other devices. That
+    absence is exactly why <code>warp</code> is a precomputed table: with a fixed
+    orientation, the sampling is identical on every frame.
+  </p>
+</section>
+
+<section id="quality">
+  <h2>Quality bar</h2>
+  <ul class="features">
+    <li><strong>Pure Go.</strong> <code>CGO_ENABLED=0</code> across the org. No XR SDK, no native shims.</li>
+    <li><strong>Zero dependencies.</strong> <code>xrkit</code>'s <code>go.mod</code> carries nothing third-party.</li>
+    <li><strong>100% test coverage.</strong> Gated in CI, including error branches, every package testable without a headset attached.</li>
+    <li><strong>Six architectures.</strong> Build + test on all six of Go's 64-bit targets &mdash; amd64 / arm64 natively, loong64 / riscv64 / ppc64le / s390x under qemu &mdash; because this is float64 geometry leaning on <code>Atan2</code>/<code>Asin</code>/<code>Acos</code> at their domain edges, and s390x is big-endian with a different FPU.</li>
+    <li><strong>BSD-3-Clause</strong> on every source file.</li>
+  </ul>
+</section>
+{{ end }}
