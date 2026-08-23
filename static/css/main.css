@@ -122,8 +122,8 @@ nav a:hover { color: var(--fg); }
   position: relative;
   z-index: 1;
   display: block;
-  width: 96px;
-  height: 96px;
+  width: 88px;
+  height: 88px;
   border-radius: 22px;
   margin: 0 0 1.25rem;
   box-shadow: 0 10px 30px -12px rgba(0,0,0,0.35);
