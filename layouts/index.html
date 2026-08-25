@@ -15,7 +15,7 @@
   <p class="pills">
     <span class="pill">Pure Go</span>
     <span class="pill">CGO=0</span>
-    <span class="pill">Zero dependencies</span>
+    <span class="pill">One dependency</span>
     <span class="pill">6 architectures</span>
     <span class="pill">BSD-3-Clause</span>
   </p>
@@ -59,6 +59,14 @@
       <h4><a href="https://github.com/go-xrkit/xrkit/tree/main/warp">warp</a></h4>
       <p>The projection precomputed into a lookup table, so reshaping a frame for one eye costs a copy, not a per-pixel computation. Both eyes at 4K: ~3&nbsp;ms; at 8K: ~8&nbsp;ms &mdash; against a 16.6&nbsp;ms budget at 60&nbsp;Hz, with zero allocations per frame.</p>
     </div>
+    <div class="card">
+      <h4><a href="https://github.com/go-xrkit/xrkit/tree/main/ribbon">ribbon</a></h4>
+      <p>Screens on a 360&deg; band: where each one sits, and how they composite into one panorama by yaw. A yaw on an equirectangular panorama is exactly a horizontal shift, which is why turning the band costs nothing and the warp table is never rebuilt.</p>
+    </div>
+    <div class="card">
+      <h4><a href="https://github.com/go-xrkit/xrkit/tree/main/glasses">glasses</a></h4>
+      <p>Which display is the headset, and how wide is the view. Every catalogue entry records how far it has been checked &mdash; <code>Observed</code>, <code>Enumerated</code> or <code>Published</code> &mdash; and you can declare your own model in an HCL file, where the figure you measured sits next to a comment saying what you measured it from.</p>
+    </div>
   </div>
 </section>
 
@@ -82,11 +90,36 @@
   </p>
 </section>
 
+<section id="repos">
+  <h2>Repositories</h2>
+  <p class="section-lead">
+    Four repositories with code: the geometry, and the three things built on it.
+  </p>
+  <div class="grid">
+    <div class="card">
+      <h4><a href="https://github.com/go-xrkit/xrkit">xrkit</a></h4>
+      <p>The geometry above &mdash; <code>pose</code>, <code>stereo</code>, <code>projection</code>, <code>warp</code>, <code>ribbon</code>, <code>glasses</code>. Every package is testable with no headset attached, and is gated at 100% coverage.</p>
+    </div>
+    <div class="card">
+      <h4><a href="https://github.com/go-xrkit/player">player</a></h4>
+      <p><code>xrplay film.mp4</code>: 360&deg;, VR180 and 3D films, per eye, full screen on the glasses' own display. Hardware decode, per-eye reprojection, no XR SDK anywhere in the stereo path.</p>
+    </div>
+    <div class="card">
+      <h4><a href="https://github.com/go-xrkit/desk">desk</a></h4>
+      <p>Several computer screens on the same 360&deg; ribbon, scrolled from the keyboard. Each virtual display is created at exactly one eye's resolution and given exactly the arc that eye can see, so looking straight at a screen shows it edge to edge at one source pixel per output pixel. The numbers are not configured &mdash; they follow from the headset's optics.</p>
+    </div>
+    <div class="card">
+      <h4><a href="https://github.com/go-xrkit/android">android</a></h4>
+      <p>Screen capture on Android, as an ordinary <code>CGO_ENABLED=0</code> Go binary talking to a small Java host over a socket. It also documents, with transcripts, the four different ways Android 15 refuses to let an app create a display it can launch anything onto &mdash; and what it gives you instead.</p>
+    </div>
+  </div>
+</section>
+
 <section id="quality">
   <h2>Quality bar</h2>
   <ul class="features">
     <li><strong>Pure Go.</strong> <code>CGO_ENABLED=0</code> across the org. No XR SDK, no native shims.</li>
-    <li><strong>Zero dependencies.</strong> <code>xrkit</code>'s <code>go.mod</code> carries nothing third-party.</li>
+    <li><strong>One dependency, and it is argued for.</strong> <code>xrkit</code>'s <code>go.mod</code> requires HCL, and nothing else &mdash; because a figure about a headset is only worth something with its provenance attached, and HCL has <em>comments</em>: what you measured sits next to the number you measured it from. The geometry packages themselves pull in nothing.</li>
     <li><strong>100% test coverage.</strong> Gated in CI, including error branches, every package testable without a headset attached.</li>
     <li><strong>Six architectures.</strong> Build + test on all six of Go's 64-bit targets &mdash; amd64 / arm64 natively, loong64 / riscv64 / ppc64le / s390x under qemu &mdash; because this is float64 geometry leaning on <code>Atan2</code>/<code>Asin</code>/<code>Acos</code> at their domain edges, and s390x is big-endian with a different FPU.</li>
     <li><strong>BSD-3-Clause</strong> on every source file.</li>

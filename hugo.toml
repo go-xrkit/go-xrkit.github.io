@@ -6,7 +6,7 @@ title   = 'go-xrkit'
 disableKinds = ['taxonomy', 'term', 'rss', 'sitemap']
 
 [params]
-  description = "go-xrkit is pure-Go (CGO=0) geometry for immersive video — head orientation, stereo frame packing, and flat/equirectangular/fisheye projection, precomputed into a warp table so reprojecting a frame costs a copy, not a computation. Zero dependencies, 100% coverage, six architectures."
+  description = "go-xrkit is pure-Go (CGO=0) geometry for immersive video — head orientation, stereo frame packing, and flat/equirectangular/fisheye projection, precomputed into a warp table so reprojecting a frame costs a copy, not a computation. One dependency (HCL, for the glasses catalogue), 100% coverage, six architectures."
   brand       = "go-xrkit"
   github      = "go-xrkit"
   heroAccent  = "go-xrkit"
@@ -28,6 +28,11 @@ disableKinds = ['taxonomy', 'term', 'rss', 'sitemap']
     name       = "Packages"
     url        = "#packages"
     weight     = 20
+  [[menu.main]]
+    identifier = "repos"
+    name       = "Repositories"
+    url        = "#repos"
+    weight     = 25
   [[menu.main]]
     identifier = "quality"
     name       = "Quality"
