@@ -1,45 +1,41 @@
-baseURL = 'https://go-xrkit.github.io/'
-locale  = 'en-us'
-title   = 'go-xrkit'
-# No theme — layouts live in ./layouts
+baseURL = "https://go-xrkit.github.io/"
+title = "go-xrkit"
+disableKinds = ["taxonomy", "term", "RSS", "sitemap", "404"]
 
-disableKinds = ['taxonomy', 'term', 'rss', 'sitemap']
+[markup.goldmark.renderer]
+  unsafe = true
 
-[params]
-  description = "go-xrkit is pure-Go (CGO=0) geometry for immersive video — head orientation, stereo frame packing, and flat/equirectangular/fisheye projection, precomputed into a warp table so reprojecting a frame costs a copy, not a computation. One dependency (HCL, for the glasses catalogue), 100% coverage, six architectures."
-  brand       = "go-xrkit"
-  github      = "go-xrkit"
-  heroAccent  = "go-xrkit"
-  heroTagline = "The geometry an immersive video player needs. Pure Go, no SDK, no dependencies."
+# Each repo card. "kind" says what layer it is; "type" says whether it is a
+# library you import or something you run. "proof" is the honest headline —
+# what is established, and by what measurement.
+[[params.repos]]
+  name = "xrkit"
+  what = "pose, stereo, projection, warp, ribbon, glasses"
+  kind = "geometry"
+  type = "lib"
+  proof = "both eyes of a 4K panorama reproject in 2.8 ms, with zero allocations"
+  result = "The geometry an immersive display needs, and nothing else: orientation as a quaternion, how a frame packs two eyes, the flat, equirectangular and fisheye projections, and a lookup table that turns any of them into a copy rather than a per-pixel computation. On top of those, a ribbon that places screens round a 360° band and composites them by yaw, and a catalogue that names a headset and derives its field of view. The catalogue refuses to guess: a model whose figure cannot be sourced carries none, because a wrong field of view renders everything, in the wrong place, with no symptom. Placement is checked against a per-pixel brute-force reference that reuses nothing of the fast path, and the derived angles are checked by recomposing them back into the diagonal they came from rather than against numbers typed out of a calculator. 100% coverage."
 
-  heroIntro = [
-    "<strong>go-xrkit</strong> is the pure-Go, <strong>cgo-free</strong> geometry an immersive video player needs: orientation (<code>pose</code>), how a frame packs two eyes (<code>stereo</code>), and the projections that turn a flat frame into a world you can look around in (<code>projection</code>). A fourth package, <code>warp</code>, precomputes that projection into a lookup table so reshaping a frame for one eye costs a copy, not a per-pixel computation.",
-    "<strong>go-xrkit/player</strong> (<code>xrplay</code>) puts it to use: hardware decode, per-eye reprojection, full screen on the glasses' own display. There is <strong>no XR SDK in the stereo path</strong> &mdash; the glasses expose their 3D mode as an ordinary display mode, so stereo output is a borderless window with one eye per half."
-  ]
+[[params.repos]]
+  name = "desk"
+  what = "the ribbon of screens, the compositor, and the loop that draws it"
+  kind = "application"
+  type = "app"
+  proof = "it ran on a VITURE Beast — window at (-7680,0), the panorama reaching 100% of the view"
+  result = "One screen is exactly one full view of the glasses: a display is created at one eye's resolution and given exactly the arc that eye can see, so looking straight at it shows it edge to edge at one source pixel per output pixel. The core has no operating system in it — the same loop runs on macOS, Linux, Windows and Android, and only getting the screens and their pixels arrives by different roads. Compositing a frame costs 0.9 ms because the columns are decomposed into runs and copied as blocks; gathering them one at a time cost 8.7 ms and was not the arithmetic. Where a platform cannot create displays the ribbon carries the ones the machine already has, and says so — a fallback that looks like the feature is worse than one that announces itself."
 
-[menu]
-  [[menu.main]]
-    identifier = "why"
-    name       = "Why"
-    url        = "#why"
-    weight     = 10
-  [[menu.main]]
-    identifier = "packages"
-    name       = "Packages"
-    url        = "#packages"
-    weight     = 20
-  [[menu.main]]
-    identifier = "repos"
-    name       = "Repositories"
-    url        = "#repos"
-    weight     = 25
-  [[menu.main]]
-    identifier = "quality"
-    name       = "Quality"
-    url        = "#quality"
-    weight     = 30
-  [[menu.main]]
-    identifier = "docs"
-    name       = "Docs"
-    url        = "https://go-xrkit.github.io/docs/"
-    weight     = 40
+[[params.repos]]
+  name = "android"
+  what = "the two-process Android host: capture, and a wall of displays to render onto"
+  kind = "platform"
+  type = "lib"
+  proof = "a Presentation on a display the app itself made delivers its own pixels — 0 black of 307 200"
+  result = "Android hands no drawable surface to a process that is not the app, and every path to one is behind JNI, which needs cgo. So this is two processes: a small Java host owning the Activity and the Surface, and an ordinary CGO_ENABLED=0 binary speaking to it over a socket with pixels through a shared buffer. An ordinary application cannot put OTHER apps on a display it creates — asked four ways, refused four ways, and the refusals are quoted in the repository. But it may render its own content on such a display and read the pixels back, with no permission, no consent dialog and no screen-recording chip in the status bar. That is a ring of panels carrying what Android can draw and a Go process cannot: a WebView, a decoder, a map."
+
+[[params.repos]]
+  name = "player"
+  what = "xrplay — an immersive video player for the glasses' own display"
+  kind = "application"
+  type = "app"
+  proof = "694 frames of a 7200x3600 VR180 file in 12 s, with 100% of the view covered"
+  result = "Hardware decode, per-eye reprojection, borderless full screen on the panel itself. There is no XR SDK in the stereo path: the glasses expose their 3D mode as an ordinary display mode, so stereo output is one eye per half of a wide window. Geometry is detected from the file rather than declared — a name, a shape, a marker — and a decoder is accepted only once it has actually produced a picture, because opening is not working. Transport controls appear on movement and hide again, and the sound is the clock."
