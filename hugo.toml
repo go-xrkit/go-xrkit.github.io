@@ -10,6 +10,7 @@ disableKinds = ["taxonomy", "term", "RSS", "sitemap", "404"]
 # what is established, and by what measurement.
 [[params.repos]]
   name = "xrkit"
+  coverage = "100%"
   what = "pose, stereo, projection, warp, ribbon, glasses"
   kind = "geometry"
   type = "lib"
@@ -18,6 +19,7 @@ disableKinds = ["taxonomy", "term", "RSS", "sitemap", "404"]
 
 [[params.repos]]
   name = "desk"
+  coverage = "100% portable logic"
   what = "the ribbon of screens, the compositor, and the loop that draws it"
   kind = "application"
   type = "app"
@@ -26,6 +28,7 @@ disableKinds = ["taxonomy", "term", "RSS", "sitemap", "404"]
 
 [[params.repos]]
   name = "android"
+  coverage = "100%"
   what = "the two-process Android host: capture, and a wall of displays to render onto"
   kind = "platform"
   type = "lib"
@@ -34,6 +37,7 @@ disableKinds = ["taxonomy", "term", "RSS", "sitemap", "404"]
 
 [[params.repos]]
   name = "player"
+  coverage = "100% portable logic"
   what = "xrplay — an immersive video player for the glasses' own display"
   kind = "application"
   type = "app"
