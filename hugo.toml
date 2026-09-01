@@ -38,8 +38,8 @@ disableKinds = ["taxonomy", "term", "RSS", "sitemap", "404"]
 [[params.repos]]
   name = "player"
   coverage = "100% portable logic"
-  what = "xrplay — an immersive video player for the glasses' own display"
+  what = "xrplay — an immersive video player for the glasses' own display, and a 2D film turned into 3D as it plays"
   kind = "application"
   type = "app"
   proof = "694 frames of a 7200x3600 VR180 file in 12 s, with 100% of the view covered"
-  result = "Hardware decode, per-eye reprojection, borderless full screen on the panel itself. There is no XR SDK in the stereo path: the glasses expose their 3D mode as an ordinary display mode, so stereo output is one eye per half of a wide window. Geometry is detected from the file rather than declared — a name, a shape, a marker — and a decoder is accepted only once it has actually produced a picture, because opening is not working. Transport controls appear on movement and hide again, and the sound is the clock."
+  result = "Hardware decode, per-eye reprojection, borderless full screen on the panel itself. There is no XR SDK in the stereo path: the glasses expose their 3D mode as an ordinary display mode, so stereo output is one eye per half of a wide window. Geometry is detected from the file rather than declared — a name, a shape, a marker — and a decoder is accepted only once it has actually produced a picture, because opening is not working. Transport controls appear on movement and hide again, and the sound is the clock. <strong>-3d turns an ordinary FLAT film into 3D frame by frame</strong>: depth from a real network on the Neural Engine, both eyes synthesised by compute kernels on the GPU, 36 frames a second for 3.6 ms of processor time. It all happens BEFORE the renderer — a converter wraps the source and presents side-by-side frames, so the warp, the control bar and the snapshot path never learn the feature exists — and it is refused with a reason for a film that is already stereoscopic, or on a display showing one eye. Without a model, depth is guessed from the picture itself (go-images/depth), which works anywhere and is visibly not as good; the log always says which path ran."
