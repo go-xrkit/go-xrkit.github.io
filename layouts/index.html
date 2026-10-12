@@ -3,6 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+{{/* Dark Reader repaints pages that already draw their own dark theme, as this one does: ask it to stand aside. */}}
+<meta name="darkreader-lock">
 <title>{{ .Site.Title }} — several screens on a 360° ribbon, inside AR glasses</title>
 <meta name="description" content="Pure-Go, cgo-free XR: the geometry an immersive display needs (pose, stereo, projection, warp, ribbon), a catalogue that refuses to guess a headset's optics, and an application that puts several captured screens on a band around you — on macOS, Linux, Windows and Android. No vendor SDK anywhere in the path.">
 <style>
