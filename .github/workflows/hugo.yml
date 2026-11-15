@@ -29,20 +29,31 @@ permissions:
   contents: read
   pages: read
 
-env:
-  # Pin Hugo so site builds don't break when a new release ships
-  # incompatible template changes. Bump deliberately, not by
-  # surprise.
-  HUGO_VERSION: 0.135.0
-
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      # ⛔ THE SAME VERSION AS landingkit-check.yml, AND THE SAME WAY OF GETTING
+      # IT. This job used to fetch hugo_extended's .deb with wget and install it
+      # with `sudo dpkg -i`, verifying no checksum, pinned at 0.135.0 — while
+      # the kit check next door ran 0.169.0 through this action. The site that
+      # got PUBLISHED was therefore never the site whose rules were read, 34
+      # minor releases apart (go-xrkit/go-xrkit.github.io#27).
+      #
+      # The version lives in this one input in both files because that is the
+      # one Renovate maintains: its github-actions manager updates
+      # `hugo-version` as a `uses-with` dependency, which is exactly why the
+      # action's pin was current and the hand-rolled env var was not.
       - name: Install Hugo CLI
-        run: |
-          wget -O hugo.deb "https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_linux-amd64.deb"
-          sudo dpkg -i hugo.deb
+        uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: "0.169.0"
+          # Same binary as the kit check, not merely the same version number.
+          # Measured 2026-11-15: neither this site nor landingkit v0.29.0 holds
+          # a single `.scss` or `toCSS`, so extended earns nothing here — but a
+          # judge built differently from its subject is the defect this change
+          # exists to remove, so both stay extended until both move together.
+          extended: true
 
       - name: Checkout
         uses: actions/checkout@v7
