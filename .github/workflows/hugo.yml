@@ -29,43 +29,50 @@ permissions:
   contents: read
   pages: read
 
+# ⛔ THE ONLY HUGO VERSION IN THIS REPOSITORY. There were two, in two files,
+# 34 minor releases apart (#27). Bump it here and both the build and the kit
+# check move together, because the check no longer builds anything.
+env:
+  HUGO_VERSION: "0.169.0"
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      # ⛔ THE SAME VERSION AS landingkit-check.yml, AND THE SAME WAY OF GETTING
-      # IT. This job used to fetch hugo_extended's .deb with wget and install it
-      # with `sudo dpkg -i`, verifying no checksum, pinned at 0.135.0 — while
-      # the kit check next door ran 0.169.0 through this action. The site that
-      # got PUBLISHED was therefore never the site whose rules were read, 34
-      # minor releases apart (go-xrkit/go-xrkit.github.io#27).
-      #
-      # The version lives in this one input in both files because that is the
-      # one Renovate maintains: its github-actions manager updates
-      # `hugo-version` as a `uses-with` dependency, which is exactly why the
-      # action's pin was current and the hand-rolled env var was not.
-      - name: Install Hugo CLI
-        uses: peaceiris/actions-hugo@v3
-        with:
-          hugo-version: "0.169.0"
-          # Same binary as the kit check, not merely the same version number.
-          # Measured 2026-11-15: neither this site nor landingkit v0.29.0 holds
-          # a single `.scss` or `toCSS`, so extended earns nothing here — but a
-          # judge built differently from its subject is the defect this change
-          # exists to remove, so both stay extended until both move together.
-          extended: true
-
       - name: Checkout
         uses: actions/checkout@v7
         with:
           submodules: recursive
 
       # Hugo resolves the landingkit module (hugo.toml [module]) with the go
-      # command, at the version go.mod pins.
+      # command, at the version go.mod pins — and the same toolchain installs
+      # Hugo itself, below.
       - uses: actions/setup-go@v7
         with:
           go-version-file: go.mod
           cache: false
+
+      # ⛔ FROM THE MODULE PROXY, AND THERE IS NOW EXACTLY ONE PIN IN THIS
+      # REPOSITORY. The history of this step is the argument:
+      #
+      #   .deb fetched by wget, `sudo dpkg -i`, NO checksum, pinned 0.135.0
+      #     — while the kit check next door ran 0.169.0 through an action, so
+      #       the site anybody was served was never the site whose rules were
+      #       read, 34 minor releases apart (#27).
+      #   then both on the same action at 0.169.0 — one version, still an
+      #     unverified release asset, and still two files holding the number.
+      #   now `go install`, which go-xrkit/docs already does and says why:
+      #     proxy.golang.org with the checksum database vouching for the bytes
+      #     is a stronger guarantee than the sha256 that step used to verify.
+      #
+      # ⭐ extended is NOT needed, measured rather than assumed: neither this
+      # site nor landingkit v0.29.0 contains a single `.scss` or `toCSS`, and
+      # the plain binary builds this site and passes `landingkit check` (run
+      # locally at v0.169.0 before this was written). So the one thing `go
+      # install` cannot build is the one thing nothing here uses.
+      - name: Install Hugo ${{ env.HUGO_VERSION }}
+        run: go install "github.com/gohugoio/hugo@v${HUGO_VERSION}"
+
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v6
@@ -84,6 +91,35 @@ jobs:
         uses: actions/upload-pages-artifact@v5
         with:
           path: ./public
+
+  # The kit's rules, read from the artifact that will be DEPLOYED rather than
+  # from a second build of the same source. That is what #27 was about: a judge
+  # and its subject built by different Hugos. Aligning the versions was half of
+  # it; reading the same bytes is the whole of it, and it cannot drift again.
+  kit:
+    name: the page follows the kit
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          cache: false
+      - uses: actions/download-artifact@v8
+        with:
+          name: github-pages
+          path: artifact
+      # upload-pages-artifact ships a single artifact.tar; unpacking it gives
+      # back exactly the tree Pages serves.
+      - name: Unpack the deployable artifact
+        run: |
+          mkdir -p public
+          tar -xf artifact/artifact.tar -C public
+      - name: Check
+        env:
+          GOWORK: "off"
+        run: go run github.com/go-fleettools/landingkit/cmd/landingkit check public
 
   deploy:
     environment:
